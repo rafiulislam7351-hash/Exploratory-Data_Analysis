@@ -74,6 +74,7 @@ Ensure you have targeted the database hosting your target enterprise dataset sch
 Run the scripts sequentially to compile the data view items within your local environment.
 
 Execute validation audits using standard query selection patterns:
+
 **SELECT TOP 100 * FROM gold.view_customer_analytics ORDER BY total_sales_amount DESC;**
 
 **SELECT TOP 100 * FROM gold.view_product_analytics ORDER BY total_sales DESC;**
