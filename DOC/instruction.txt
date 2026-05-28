@@ -1,0 +1,55 @@
+================================================================================
+OPERATIONAL INSTRUCTIONS: BRONZE TO GOLD LAYER PIPELINE
+================================================================================
+
+STEP 1: ESTABLISH THE MEDALLION LAYER ARCHITECTURE
+--------------------------------------------------------------------------------
+A. Ensure your environment has distinct storage zones or database schemas 
+   defined for all three layers: 'bronze', 'silver', and 'gold'.
+B. Confirm your raw source data (JSON, CSV, or transactional logs) is successfully
+   ingested into the 'bronze' schema exactly as it arrived, without changes.
+
+STEP 2: TRANSITION FROM BRONZE TO SILVER (CLEANSING & STANDARDIZATION)
+--------------------------------------------------------------------------------
+A. Read the raw records directly out of the bronze layer tables.
+B. Enforce strict data types (e.g., convert string dates to actual DATE formats, 
+   cast numeric fields into DECIMAL or INTEGER).
+C. Handle missing data by dropping critical null entries or replacing blank values 
+   with standardized placeholders (e.g., 'Unknown').
+D. Deduplicate the records by applying window functions (like ROW_NUMBER) to isolate
+   and keep only the most recent transaction or record per unique ID.
+E. Write these clean, standardized tables directly into the 'silver' schema.
+
+STEP 3: DESIGN THE GOLD ARCHITECTURE (STAR SCHEMA DESIGN)
+--------------------------------------------------------------------------------
+A. Analyze your business requirements to map out a Star Schema design.
+B. Group your silver data into two distinct categories:
+   - Dimensions: Descriptive attributes (Who, What, Where, e.g., Customers, Products).
+   - Facts: Quantitative measurements/events (How much, When, e.g., Sales, Orders).
+
+STEP 4: BUILD THE GOLD DIMENSION VIEWS (DIM-TABLES)
+--------------------------------------------------------------------------------
+A. Source data directly from the newly cleaned silver descriptive tables.
+B. Select and rename the technical source columns into business-friendly, 
+   readable aliases suitable for reporting tools.
+C. Generate sequential, database-optimized surrogate keys (e.g., product_key) 
+   using ordering functions to serve as the new primary keys for these dimensions.
+D. Save these definitions as views inside the 'gold' schema.
+
+STEP 5: BUILD THE GOLD FACT VIEW (FACT-TABLE)
+--------------------------------------------------------------------------------
+A. Target your core transactional data from the silver layer.
+B. Link this transaction data to your newly created Gold Dimension views.
+C. Use JOIN operations to match the natural business keys present in your silver 
+   transactions with the corresponding business keys in your Gold dimensions.
+D. Select only the newly generated dimension surrogate keys along with the core 
+   numerical metrics (such as quantities, prices, and revenue).
+E. Save this consolidated analytical table as a view inside the 'gold' schema.
+
+STEP 6: DEPLOYMENT AND CONSUMPTION VALIDATION
+--------------------------------------------------------------------------------
+A. Execute the compilation scripts to publish the views in the database engine.
+B. Verify referential integrity by checking that every transaction in your 
+   fact view correctly matches a record in your dimension views.
+C. Connect your business intelligence, dashboarding, or reporting applications 
+   directly to the 'gold' schema views.
